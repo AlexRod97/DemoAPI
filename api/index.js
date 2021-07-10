@@ -6,10 +6,10 @@ const bodparser = require('body-parser');
 app.use(bodparser.json());
 
 var mysqlConnection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'bddprueba',
+    host: '34.138.80.34',
+    user: 'alexanderRodSua',
+    password: 'default12345',
+    database: 'bddProofOfConcept',
     multipleStatements: true
 });
 
@@ -23,8 +23,8 @@ mysqlConnection.connect((err=> {
 app.listen(3000, ()=>console.log('Express server is running at port no: 3000'));
 
 //Get all users
-app.get('/Users',(req,res)=>{
-    mysqlConnection.query('SELECT * FROM usuario',(err, rows, fields)=> {
+app.get('/Facturas',(req,res)=>{
+    mysqlConnection.query('CALL GetAll();',(err, rows, fields)=> {
         if(!err)
         res.send(rows);
         else
@@ -33,24 +33,23 @@ app.get('/Users',(req,res)=>{
 });
 
 //Get a single user 
-app.get('/Users/:id',(req,res)=>{
-    mysqlConnection.query('SELECT * FROM usuario WHERE id = ?',[req.params.id],(err, rows, fields)=> {
+app.get('/Facturas/:id',(req,res)=>{
+    mysqlConnection.query('CALL GetSingle(?);',[req.params.id],(err, rows, fields)=> {
         if(!err)
-        res.send(rows);
+        res.send(rows);        
         else
         console.log(err);
     })
 });
 
 //Post (insert) a user
-app.post('/Users/add',(req,res)=> {
-    let user = req.body;
-    mysqlConnection.query('INSERT INTO usuario (Nombre, Apellido)\
-                             VALUES (?,?);',
-                             [user.nombre, user.apellido],(err, rows, fields)=> {
+app.post('/Facturas/add',(req,res)=> {
+    let factura = req.body;
+    mysqlConnection.query('CALL AddSingle(?,?,?,?,?);',    
+                             [factura.Cliente, factura.Peso, factura.Precio, factura.Subtotal,factura.Total],(err, rows, fields)=> {
         if(!err) {
             res.send(rows);
-            console.log('User inserted');
+            console.log('Factura agregada');
         }        
         else
         console.log(err);
@@ -58,18 +57,14 @@ app.post('/Users/add',(req,res)=> {
 });
 
 //Post (update) a user
-app.post('/Users/update',(req,res)=> {
-    let user = req.body;    
+app.post('/Facturas/update',(req,res)=> {
+    let factura = req.body;    
 
-    mysqlConnection.query('UPDATE usuario \
-                           SET \
-                            Nombre = ?,\
-                            Apellido = ?\
-                            WHERE id = ?;',
-                            [user.nombre, user.apellido, user.id],(err, rows, fields)=> {
+    mysqlConnection.query('CALL EditSingle(?,?,?,?,?,?);',
+                            [factura.NumFactura, factura.Cliente, factura.Peso, factura.Precio, factura.Subtotal,factura.Total],(err, rows, fields)=> {
         if(!err) {
             res.send(rows);
-            console.log('User updated');
+            console.log('Factura actualizada');
         }        
         else
         console.log(err);
@@ -77,8 +72,8 @@ app.post('/Users/update',(req,res)=> {
 });
 
 //Delete a user 
-app.get('/DeleteUser/:id',(req,res)=>{
-    mysqlConnection.query('DELETE FROM usuario WHERE id = ?',[req.params.id],(err, rows, fields)=> {
+app.get('/Facturas/Delete/:id',(req,res)=>{
+    mysqlConnection.query('CALL DeleteSingle(?);',[req.params.id],(err, rows, fields)=> {
         if(!err)
         res.send('Deleted successfully');
         else

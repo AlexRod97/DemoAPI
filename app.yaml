@@ -1,0 +1,7 @@
+runtime: nodejs10
+
+env_variables:
+  DB_USER: alexanderRodSua
+  DB_PASS: default12345
+  DB_NAME: bddProofOfConcept
+  CLOUD_SQL_CONNECTION_NAME: analysistestproyect:us-east1:my-sql-analysis-instance
